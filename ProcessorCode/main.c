@@ -2,12 +2,20 @@ register unsigned int _R0 __asm("r0");  // method 2 : declare 'C' names for the 
 register unsigned int _R1 __asm("r1");
 
 char grid[16] = {5};
+int tap[2] = {2, 4};
 
-__asm int memLocate(void) 
+__asm void memLocate(void) 
 {
   ldr r3, =__cpp(&grid);	 	// method 3. Use the 'C' variables in assembly (fetch the address of x)
 	ldr r0, [r3];        	// related to method 3 - fetch the value of x
+	ldr r4, =__cpp(&tap);
+	ldr r1, [r4];
 };
+
+__asm void firColumn(void)
+{
+	
+}
 
 void initGrid(void)
 {
@@ -29,5 +37,6 @@ int main (void)
 	_R1 = 2;
 	initGrid();
 	memLocate();
+	firColumn();
 	
 }
