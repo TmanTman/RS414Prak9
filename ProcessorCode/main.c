@@ -10,11 +10,22 @@ __asm void memLocate(void)
 	ldr r0, [r3];        	// related to method 3 - fetch the value of x
 	ldr r4, =__cpp(&tap);
 	ldr r1, [r4];
-};
+	bx lr
+}
 
 __asm void firColumn(void)
 {
-	
+ 	//Push register that will be temp address storage
+	push {r1};
+ 	//Store registers that will hold constants
+ 	push {r6, r7};
+ 	//Store registers that will hold gridvalues
+ 	push {r2, r3};
+ 	//Load constant values
+ 	ldr r1, =__cpp(&tap);
+ 	ldr r6, [r1];
+ 	ldr r7, [r1,#4];
+	bx lr
 }
 
 void initGrid(void)
@@ -31,12 +42,18 @@ void initGrid(void)
 	}
 }
 
+void cFunc(void)
+{
+	grid[0] = 10;
+}
+
 int main (void) 
 {
 	_R0 = 1;
 	_R1 = 2;
+	cFunc();
 	initGrid();
 	memLocate();
+	cFunc();
 	firColumn();
-	
 }
