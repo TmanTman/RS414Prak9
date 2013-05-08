@@ -4,7 +4,7 @@ register unsigned int _R1 __asm("r1");
 char grid[16] = {5};
 int tap[3] = {2, 4, 3};
 
-__asm void firColumn(void)
+__asm void firRow(void)
 {
 	//Initialize 
 	mov r1, #0; counter
@@ -15,7 +15,7 @@ __asm void firColumn(void)
 	ldr r5, [r12,#8];
 	ldr r12, =__cpp(&grid); pointer to grid start address
 colStart
-	cmp r1, #3;
+	cmp r1, #4;
 	beq done;
 	//Load row values
 	cmp r1, #0; //special load operation at start of row
@@ -34,9 +34,12 @@ counter1
 	ldrb r4, [r12,#1];
 	b next ;
 normalLoad	//normal load operation
-	ldrb r2, [r12]
-	ldrb r3, [r12, #1];
-	ldrb r4, [r12, #2];
+	sub r1, #2; To reach first address, as R1 points to leading address
+	ldrb r2, [r12, r1];
+	add r1, #1;
+	ldrb r3, [r12, r1];
+	add r1, #1;
+	ldrb r4, [r12, r1];
 next
 	//Do multiplication
 	mul r4, r7;
@@ -46,7 +49,7 @@ next
 	add r2, r3;
 	add r2, r4;
 	//move result to memory
-	strb r2, [r12]
+	strb r2, [r12, r1]
 	//loop with counter r1
 	add r1, #1;
 	b colStart
@@ -72,5 +75,5 @@ void initGrid(void)
 int main (void) 
 {
 	initGrid();
-	firColumn();
+	firRow();
 }
