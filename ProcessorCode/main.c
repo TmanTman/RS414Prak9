@@ -15,17 +15,22 @@ __asm void memLocate(void)
 
 __asm void firColumn(void)
 {
- 	//Push register that will be temp address storage
-	push {r1};
- 	//Store registers that will hold constants
- 	push {r6, r7};
- 	//Store registers that will hold gridvalues
- 	push {r2, r3};
  	//Load constant values
  	ldr r1, =__cpp(&tap);
  	ldr r6, [r1];
  	ldr r7, [r1,#4];
-	bx lr
+	//Load cloumn values
+	ldr r1, =__cpp(&grid);
+	ldr r2, [r1];
+	ldr r3, [r1, #1];
+	//Do multiplication and add all taps
+	mul r2, r6;
+	mul r3, r7;
+	add r2, r3;
+	//move result to memory
+	str r2, [r1]
+	//return to main
+	bx lr;
 }
 
 void initGrid(void)
