@@ -6,16 +6,18 @@ int tap[3] = {2, 4, 3};
 
 __asm void firColumn(void)
 {
-	//Initialize counter
-	mov r1, #0;
-	//Load constant values
+	//Initialize 
+	mov r1, #0; counter
+	;Load gain values
  	ldr r12, =__cpp(&tap);
  	ldr r7, [r12];
  	ldr r6, [r12,#4];
 	ldr r5, [r12,#8];
+	ldr r12, =__cpp(&grid); pointer to grid start address
+colStart
+	cmp r1, #3;
+	beq done;
 	//Load row values
-	ldr r12, =__cpp(&grid); //pointer to grid start address
-	//loading values from grid
 	cmp r1, #0; //special load operation at start of row
 	beq counter0 ;
 	cmp r1, #1; //special load operation at start of row
@@ -45,7 +47,11 @@ next
 	add r2, r4;
 	//move result to memory
 	strb r2, [r12]
+	//loop with counter r1
+	add r1, #1;
+	b colStart
 	//return to main
+done	
 	bx lr;
 }
 
