@@ -13,28 +13,38 @@ __asm void firColumn(void)
  	ldr r7, [r12];
  	ldr r6, [r12,#4];
 	ldr r5, [r12,#8];
-	//Load column values
-	//If counter = 0, do a special load operation	
-	cmp r1, #0;
+	//Load row values
+	ldr r12, =__cpp(&grid); //pointer to grid start address
+	//loading values from grid
+	cmp r1, #0; //special load operation at start of row
 	beq counter0 ;
-	cmp r1, #1;
+	cmp r1, #1; //special load operation at start of row
 	beq counter1 ;
-	mov r2, #0x10;
+	b normalLoad ;
+counter0	
+	mov r2, #0;
+	mov r3, #0;
+	ldrb r4, [r12];
 	b next ;
-counter0	mov r2, #0x20;
+counter1
+	mov r2, #0;
+	ldrb r3, [r12];
+	ldrb r4, [r12,#1];
 	b next ;
-counter1	mov r2, #0x30;
-	b next ;
-next
-	ldr r12, =__cpp(&grid);
+normalLoad	//normal load operation
 	ldrb r2, [r12]
 	ldrb r3, [r12, #1];
-	//Do multiplication and add all taps
-	mul r2, r6;
-	mul r3, r7;
+	ldrb r4, [r12, #2];
+next
+	//Do multiplication
+	mul r4, r7;
+	mul r3, r6;
+	mul r2, r5;
+	//add all taps
 	add r2, r3;
+	add r2, r4;
 	//move result to memory
-	str r2, [r1]
+	strb r2, [r12]
 	//return to main
 	bx lr;
 }
