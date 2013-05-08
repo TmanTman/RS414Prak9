@@ -2,27 +2,33 @@ register unsigned int _R0 __asm("r0");  // method 2 : declare 'C' names for the 
 register unsigned int _R1 __asm("r1");
 
 char grid[16] = {5};
-int tap[2] = {2, 4};
-
-__asm void memLocate(void) 
-{
-  ldr r3, =__cpp(&grid);	 	// method 3. Use the 'C' variables in assembly (fetch the address of x)
-	ldr r0, [r3];        	// related to method 3 - fetch the value of x
-	ldr r4, =__cpp(&tap);
-	ldr r1, [r4];
-	bx lr
-}
+int tap[3] = {2, 4, 3};
 
 __asm void firColumn(void)
 {
- 	//Load constant values
- 	ldr r1, =__cpp(&tap);
- 	ldr r6, [r1];
- 	ldr r7, [r1,#4];k
-	//Load cloumn values
-	ldr r1, =__cpp(&grid);
-	ldrb r2, [r1]
-	ldrb r3, [r1, #1];
+	//Initialize counter
+	mov r1, #0;
+	//Load constant values
+ 	ldr r12, =__cpp(&tap);
+ 	ldr r7, [r12];
+ 	ldr r6, [r12,#4];
+	ldr r5, [r12,#8];
+	//Load column values
+	//If counter = 0, do a special load operation	
+	cmp r1, #0;
+	beq counter0 ;
+	cmp r1, #1;
+	beq counter1 ;
+	mov r2, #0x10;
+	b next ;
+counter0	mov r2, #0x20;
+	b next ;
+counter1	mov r2, #0x30;
+	b next ;
+next
+	ldr r12, =__cpp(&grid);
+	ldrb r2, [r12]
+	ldrb r3, [r12, #1];
 	//Do multiplication and add all taps
 	mul r2, r6;
 	mul r3, r7;
@@ -47,18 +53,8 @@ void initGrid(void)
 	}
 }
 
-void cFunc(void)
-{
-	grid[0] = 10;
-}
-
 int main (void) 
 {
-	_R0 = 1;
-	_R1 = 2;
-	cFunc();
 	initGrid();
-	memLocate();
-	cFunc();
 	firColumn();
 }
