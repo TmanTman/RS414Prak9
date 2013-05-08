@@ -18,11 +18,11 @@ __asm void firColumn(void)
  	//Load constant values
  	ldr r1, =__cpp(&tap);
  	ldr r6, [r1];
- 	ldr r7, [r1,#4];
+ 	ldr r7, [r1,#4];k
 	//Load cloumn values
 	ldr r1, =__cpp(&grid);
-	ldr r2, [r1];
-	ldr r3, [r1, #1];
+	ldrb r2, [r1]
+	ldrb r3, [r1, #1];
 	//Do multiplication and add all taps
 	mul r2, r6;
 	mul r3, r7;
