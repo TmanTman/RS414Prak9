@@ -2,7 +2,7 @@
 char grid[10000] = {5};
 char rowOutput[10000] = {3};
 char colOutput[10000] = {3};
-int tap[3] = {2, 4, 3};
+int tap[5] = {2, 4, 3, 1, 5};
 int outputBase = 0;
 
 __asm void firRow(void)
@@ -16,10 +16,12 @@ __asm void firRow(void)
 	mov r1, #0; column counter
 	mov r0, #0; row counter
 	;Load gain values
- 	ldr r12, =__cpp(&tap);
- 	ldr r11, [r12];
- 	ldr r10, [r12,#4];
-	ldr r9, [r12,#8];
+ 	ldr r12, =__cpp(&tap)
+ 	ldr r11, [r12]
+ 	ldr r10, [r12,#4]
+	ldr r9, [r12,#8]
+	ldr r8, [r12,#12]
+	ldr r7, [r12,#16]
 	ldr r12, =__cpp(&grid); pointer to grid start address
 	//Outer Loop
 newRow
@@ -38,19 +40,45 @@ colStart
 	beq rcounter0 ;
 	cmp r1, #1; special load operation at start of row
 	beq rcounter1 ;
+	cmp r1, #2; special load operation at start of row
+	beq rcounter2 ;
+	cmp r1, #3; special load operation at start of row
+	beq rcounter3 ;
 	b rnormalLoad ;normal load operation
-rcounter0	
-	mov r4, #0;
-	mov r5, #0;
-	ldrb r6, [r12];
+rcounter0
+	mov r2, #0
+	mov r3, #0
+	mov r4, #0
+	mov r5, #0
+	ldrb r6, [r12];load leading value
 	b rnext ;
 rcounter1
-	mov r4, #0;
+	mov r2, #0
+	mov r3, #0
+	mov r4, #0
 	ldrb r5, [r12];
 	ldrb r6, [r12,#1];
 	b rnext ;
+rcounter2
+	mov r2, #0
+	mov r3, #0
+	ldrb r4, [r12]
+	ldrb r5, [r12,#1]
+	ldrb r6, [r12,#2]
+	b rnext ;
+rcounter3
+	mov r2, #0
+	ldrb r3, [r12]
+	ldrb r4, [r12,#1]
+	ldrb r5, [r12,#2]
+	ldrb r6, [r12,#3]
+	b rnext ;
 rnormalLoad	
-	sub r1, #2; To reach first address, as R1 points to leading address
+	sub r1, #4; To reach first address, as R1 points to leading address
+	ldrb r2, [r12, r1];
+	add r1, #1;
+	ldrb r3, [r12, r1];
+	add r1, #1;
 	ldrb r4, [r12, r1];
 	add r1, #1;
 	ldrb r5, [r12, r1];
@@ -61,14 +89,18 @@ rnext
 	mul r6, r11;
 	mul r5, r10;
 	mul r4, r9;
+	mul r3, r8
+	mul r2, r7
 	//add all taps
-	add r4, r5;
-	add r4, r6;
+	add r2, r3
+	add r2, r4
+	add r2, r5;
+	add r2, r6;
 	//move result to memory
-		push {r11, r12}
+	push {r11, r12}
 	ldr r12, =__cpp(&outputBase)
 	ldr r11, [r12]
-	strb r4, [r11, r1]
+	strb r2, [r11, r1]
 	pop {r11, r12}
 	//loop with counter r1
 	add r1, #1;
@@ -103,57 +135,90 @@ __asm void firColumn(void)
  	ldr r11, [r12];
  	ldr r10, [r12,#4];
 	ldr r9, [r12,#8];
+	ldr r8, [r12,#12]
+	ldr r7, [r12,#16]
 	ldr r12, =__cpp(&grid); pointer to grid start address
 	//Outer loop
 newColumn
 	//Reset row counter
 	mov r0, #0;
-	//Check whether last column has been reached
-	cmp r1, #100; 
-	beq cgridDone;
 	//Inner Loop
 rowLoop 
-	//Check whether last row has been reached
-	cmp r0, #100;
-	beq colDone;
 	//Load column values
-	cmp r0, #0; //special load operation at start of row
+	cmp r0, #0; //special load operation at start of column
 	beq ccounter0 ;
-	cmp r0, #1; //special load operation at start of row
+	cmp r0, #1; //special load operation at start of column
 	beq ccounter1 ;
+	cmp r0, #2; //special load operation at start of column
+	beq ccounter2 ;
+	cmp r0, #3; //special load operation at start of column
+	beq ccounter3 ;
 	b cnormalLoad ;
 ccounter0	
+	mov r2, #0
+	mov r3, #0
 	mov r4, #0;
 	mov r5, #0;
 	ldrb r6, [r12];
 	b cnext ;
 ccounter1
+	mov r2, #0
+	mov r3, #0
 	mov r4, #0;
 	sub r12, #100
 	ldrb r5, [r12];
 	add r12, #100
 	ldrb r6, [r12];
 	b cnext ;
-cnormalLoad	//normal load operation
-	sub r12, #200; To reach first address, as r12 points to leading address
-	ldrb r4, [r12];
-	add r12, #100;
+ccounter2
+	mov r2, #0
+	mov r3, #0
+	sub r12, #200
+	ldrb r4, [r12]
+	add r12, #100
 	ldrb r5, [r12]
-	add r12, #100;
+	add r12, #100
+	ldrb r6, [r12];
+	b cnext ;
+ccounter3
+	mov r2, #0
+	sub r12, #300
+	ldrb r3, [r12]
+	add r12, #100
+	ldrb r4, [r12]
+	add r12, #100
+	ldrb r5, [r12]
+	add r12, #100
+	ldrb r6, [r12];
+	b cnext ;
+cnormalLoad	//normal load operation
+	sub r12, #400; To reach first address, as r12 points to leading address
+	ldrb r2, [r12]
+	add r12, #100
+	ldrb r3, [r12]
+	add r12, #100
+	ldrb r4, [r12]
+	add r12, #100
+	ldrb r5, [r12]
+	add r12, #100
 	ldrb r6, [r12]
 cnext
 	//Do multiplication
-	mul r6, r11;
-	mul r5, r10;
-	mul r4, r9;
+	mul r6, r11
+	mul r5, r10
+	mul r4, r9
+	mul r3, r8
+	mul r2, r7
 	//add all taps
-	add r4, r5;
-	add r4, r6;
+	add r2, r3
+	add r2, r4
+	add r2, r5
+	add r2, r6
 	//move result to memory
 	push {r11, r12}
 	ldr r12, =__cpp(&outputBase)
 	ldr r11, [r12]
-	strb r4, [r11]
+	strb r2, [r11]
 	pop {r11, r12}
 	//increase column counter and base addresses
 	add r0, #1
@@ -165,9 +230,15 @@ cnext
 	add r11, #100;r11 now holds value 100 places further that base address
 	str r11, [r12]
 	pop {r11, r12}
+	//Check whether last row has been reached
+	cmp r0, #100;
+	beq colDone;
 	b rowLoop
 colDone
 	add r1, #1; increase row counter
+	//Check whether last column has been reached
+	cmp r1, #100; 
+	beq cgridDone;
 	//restore r12 to base of column
 	sub r12, #4000
 	sub r12, #4000
