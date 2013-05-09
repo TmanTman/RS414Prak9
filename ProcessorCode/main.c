@@ -3,6 +3,7 @@ register unsigned int _R1 __asm("r1");
 
 char grid[10000] = {5};
 char rowOutput[10000] = {3};
+char colOutput[10000] = {3};
 int tap[3] = {2, 4, 3};
 
 __asm void firRow(void)
@@ -23,36 +24,36 @@ newRow
 	mov r1, #0;
 	//Check whether last row has been reached
 	cmp r10, #100; 
-	beq gridDone;
+	beq rgridDone;
 	//Inner Loop
-colStart ; Inner loop
+colStart 
 	//Check whether last column has been reached
 	cmp r1, #100;
 	beq rowDone;
 	//Load row values
 	cmp r1, #0; //special load operation at start of row
-	beq counter0 ;
+	beq rcounter0 ;
 	cmp r1, #1; //special load operation at start of row
-	beq counter1 ;
-	b normalLoad ;
-counter0	
+	beq rcounter1 ;
+	b rnormalLoad ;
+rcounter0	
 	mov r2, #0;
 	mov r3, #0;
 	ldrb r4, [r12];
-	b next ;
-counter1
+	b rnext ;
+rcounter1
 	mov r2, #0;
 	ldrb r3, [r12];
 	ldrb r4, [r12,#1];
-	b next ;
-normalLoad	//normal load operation
+	b rnext ;
+rnormalLoad	//normal load operation
 	sub r1, #2; To reach first address, as R1 points to leading address
 	ldrb r2, [r12, r1];
 	add r1, #1;
 	ldrb r3, [r12, r1];
 	add r1, #1;
 	ldrb r4, [r12, r1];
-next
+rnext
 	//Do multiplication
 	mul r4, r7;
 	mul r3, r6;
@@ -65,14 +66,101 @@ next
 	//loop with counter r1
 	add r1, #1;
 	b colStart
-	//return to main
 rowDone
 	add r10, #1; increase row counter
 	add r12, #100; shift r12 to beginning of next row
 	add r11, #100; shift r11 to beginning of next row
 	b newRow
-gridDone	
+rgridDone	
 	bx lr;
+}
+
+__asm void firColumn(void)
+{
+	//Initialize 
+	mov r1, #0; column counter
+	mov r10, #0; row counter
+	;Load gain values
+ 	ldr r12, =__cpp(&tap);
+ 	ldr r7, [r12];
+ 	ldr r6, [r12,#4];
+	ldr r5, [r12,#8];
+	ldr r12, =__cpp(&grid); pointer to grid start address
+	ldr r11, =__cpp(&colOutput);
+	//Outer loop
+newColumn
+	//Reset row counter
+	mov r10, #0;
+	//Check whether last column has been reached
+	cmp r1, #100; 
+	beq cgridDone;
+	//Inner Loop
+rowLoop 
+	//Check whether last row has been reached
+	cmp r10, #100;
+	beq colDone;
+	//Load column values
+	cmp r10, #0; //special load operation at start of row
+	beq ccounter0 ;
+	cmp r10, #1; //special load operation at start of row
+	beq ccounter1 ;
+	b cnormalLoad ;
+ccounter0	
+	mov r2, #0;
+	mov r3, #0;
+	ldrb r4, [r12];
+	b cnext ;
+ccounter1
+	mov r2, #0;
+	sub r12, #100
+	ldrb r3, [r12];
+	add r12, #100
+	ldrb r4, [r12];
+	b cnext ;
+cnormalLoad	//normal load operation
+	sub r12, #200; To reach first address, as R10 points to leading address
+	ldrb r2, [r12];
+	add r12, #100;
+	ldrb r3, [r12]
+	add r12, #100;
+	ldrb r4, [r12]
+cnext
+	//Do multiplication
+	mul r4, r7;
+	mul r3, r6;
+	mul r2, r5;
+	//add all taps
+	add r2, r3;
+	add r2, r4;
+	//move result to memory
+	strb r2, [r11]
+	//increase column counter and base addresses
+	add r10, #1
+	add r12, #100
+	add r11, #100
+	b rowLoop
+colDone
+	add r1, #1; increase row counter
+	//restore r12 to base of column
+	sub r12, #4000
+	sub r12, #4000
+	sub r12, #2000
+	add r12, #1; shift r12 to base of next column
+	//restore r11 to base of column
+	sub r11, #4000
+	sub r11, #4000
+	sub r11, #2000
+	add r11, #1; shift r11 to beginning of next column
+	b newColumn
+cgridDone	
+	bx lr;
+}
+
+__asm void testPushPop (void)
+{
+	push {r12}
+	mov r12, #10
+	pop {r12}
 }
 
 void initGrid(void)
@@ -93,4 +181,6 @@ int main (void)
 {
 	initGrid();
 	firRow();
+	firColumn();
+	testPushPop();
 }
