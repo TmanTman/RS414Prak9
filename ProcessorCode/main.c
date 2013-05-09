@@ -17,9 +17,9 @@ __asm void firRow(void)
 	mov r0, #0; row counter
 	;Load gain values
  	ldr r12, =__cpp(&tap);
- 	ldr r7, [r12];
- 	ldr r6, [r12,#4];
-	ldr r5, [r12,#8];
+ 	ldr r11, [r12];
+ 	ldr r10, [r12,#4];
+	ldr r9, [r12,#8];
 	ldr r12, =__cpp(&grid); pointer to grid start address
 	//Outer Loop
 newRow
@@ -58,9 +58,9 @@ rnormalLoad
 	ldrb r4, [r12, r1];
 rnext
 	//Do multiplication
-	mul r4, r7;
-	mul r3, r6;
-	mul r2, r5;
+	mul r4, r11;
+	mul r3, r10;
+	mul r2, r9;
 	//add all taps
 	add r2, r3;
 	add r2, r4;
@@ -100,9 +100,9 @@ __asm void firColumn(void)
 	mov r0, #0; row counter
 	;Load gain values
  	ldr r12, =__cpp(&tap);
- 	ldr r7, [r12];
- 	ldr r6, [r12,#4];
-	ldr r5, [r12,#8];
+ 	ldr r11, [r12];
+ 	ldr r10, [r12,#4];
+	ldr r9, [r12,#8];
 	ldr r12, =__cpp(&grid); pointer to grid start address
 	//Outer loop
 newColumn
@@ -143,9 +143,9 @@ cnormalLoad	//normal load operation
 	ldrb r4, [r12]
 cnext
 	//Do multiplication
-	mul r4, r7;
-	mul r3, r6;
-	mul r2, r5;
+	mul r4, r11;
+	mul r3, r10;
+	mul r2, r9;
 	//add all taps
 	add r2, r3;
 	add r2, r4;
