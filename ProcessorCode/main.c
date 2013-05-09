@@ -93,7 +93,12 @@ rgridDone
 
 __asm void firColumn(void)
 {
-	//Initialize 
+	//Initialize
+	;init the output array base value to memory
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, =__cpp(&colOutput)
+	str r11, [r12]
+	;init counters
 	mov r1, #0; column counter
 	mov r10, #0; row counter
 	;Load gain values
@@ -102,7 +107,6 @@ __asm void firColumn(void)
  	ldr r6, [r12,#4];
 	ldr r5, [r12,#8];
 	ldr r12, =__cpp(&grid); pointer to grid start address
-	ldr r11, =__cpp(&colOutput);
 	//Outer loop
 newColumn
 	//Reset row counter
@@ -149,11 +153,21 @@ cnext
 	add r2, r3;
 	add r2, r4;
 	//move result to memory
+	push {r11, r12}
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, [r12]
 	strb r2, [r11]
+	pop {r11, r12}
 	//increase column counter and base addresses
 	add r10, #1
 	add r12, #100
-	add r11, #100
+	;increase base address of output grid
+	push {r11, r12}
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, [r12]
+	add r11, #100;r11 now holds value 100 places further that base address
+	str r11, [r12]
+	pop {r11, r12}
 	b rowLoop
 colDone
 	add r1, #1; increase row counter
@@ -163,10 +177,15 @@ colDone
 	sub r12, #2000
 	add r12, #1; shift r12 to base of next column
 	//restore r11 to base of column
+	push {r11, r12}
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, [r12]
 	sub r11, #4000
 	sub r11, #4000
 	sub r11, #2000
-	add r11, #1; shift r11 to beginning of next column
+	add r11, #1; shift r11 to beginning of next column 
+	str r11, [r12]; store r11 to memory
+	pop {r11, r12}
 	b newColumn
 cgridDone	
 	bx lr;
@@ -219,5 +238,4 @@ int main (void)
 	initGrid();
 	firRow();
 	firColumn();
-	testOB();
 }
