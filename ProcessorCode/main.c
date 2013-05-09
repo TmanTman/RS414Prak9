@@ -1,7 +1,8 @@
 register unsigned int _R0 __asm("r0");  // method 2 : declare 'C' names for the registers
 register unsigned int _R1 __asm("r1");
 
-char grid[16] = {5};
+char grid[10000] = {5};
+char rowOutput[10000] = {3};
 int tap[3] = {2, 4, 3};
 
 __asm void firRow(void)
@@ -15,16 +16,18 @@ __asm void firRow(void)
  	ldr r6, [r12,#4];
 	ldr r5, [r12,#8];
 	ldr r12, =__cpp(&grid); pointer to grid start address
+	ldr r11, =__cpp(&rowOutput);
 	//Outer Loop
 newRow
 	//Reset column counter
 	mov r1, #0;
 	//Check whether last row has been reached
-	cmp r10, #4; 
+	cmp r10, #100; 
 	beq gridDone;
 	//Inner Loop
 colStart ; Inner loop
-	cmp r1, #4; Test whether end of column has been reached
+	//Check whether last column has been reached
+	cmp r1, #100;
 	beq rowDone;
 	//Load row values
 	cmp r1, #0; //special load operation at start of row
@@ -58,14 +61,15 @@ next
 	add r2, r3;
 	add r2, r4;
 	//move result to memory
-	strb r2, [r12, r1]
+	strb r2, [r11, r1]
 	//loop with counter r1
 	add r1, #1;
 	b colStart
 	//return to main
 rowDone
 	add r10, #1; increase row counter
-	add r12, #4; shift r12 to beginning of next row
+	add r12, #100; shift r12 to beginning of next row
+	add r11, #100; shift r11 to beginning of next row
 	b newRow
 gridDone	
 	bx lr;
@@ -75,12 +79,12 @@ void initGrid(void)
 {
 	int i = 0;
 	int j = 0;
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 100; i++)
 	{
-		for (j = 0; j < 4; j++)
+		for (j = 0; j < 100; j++)
 		{
-			if (i >= 1 && i <= 2 && j >= 1 && j <= 2) grid[i*4+j] = 70;
-			else grid[i*4+j] = 5;
+			if (i >= 40 && i <= 59 && j >= 40 && j <= 59) grid[i*100+j] = 70;
+			else grid[i*100+j] = 5;
 		}
 	}
 }

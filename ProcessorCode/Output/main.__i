@@ -1,5 +1,5 @@
 -c --cpu Cortex-M3 -D__EVAL -g -O0 --apcs=interwork 
--I "D:\Program Files Harddrive\Kiell\ARM\RV31\INC" 
--I "D:\Program Files Harddrive\Kiell\ARM\CMSIS\Include" 
--I "D:\Program Files Harddrive\Kiell\ARM\Inc\Luminary" 
+-I C:\Keil\ARM\RV31\INC 
+-I C:\Keil\ARM\CMSIS\Include 
+-I C:\Keil\ARM\Inc\Luminary 
 -o ".\Output\main.o" --omf_browse ".\Output\main.crf" --depend ".\Output\main.d" "main.c"
