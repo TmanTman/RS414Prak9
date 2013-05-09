@@ -1,6 +1,7 @@
 register unsigned int _R0 __asm("r0");  // method 2 : declare 'C' names for the registers
 register unsigned int _R1 __asm("r1");
 
+//init with bogus values to ensure memory area has write permissions
 char grid[10000] = {5};
 char rowOutput[10000] = {3};
 char colOutput[10000] = {3};
@@ -9,7 +10,12 @@ int outputBase = 0;
 
 __asm void firRow(void)
 {
-	//Initialize 
+	//Initialize
+	;load output array address in memory
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, =__cpp(&rowOutput)
+	str r11, [r12]
+	;init counters
 	mov r1, #0; column counter
 	mov r10, #0; row counter
 	;Load gain values
@@ -31,11 +37,11 @@ colStart
 	cmp r1, #100;
 	beq rowDone;
 	//Load row values
-	cmp r1, #0; //special load operation at start of row
+	cmp r1, #0; special load operation at start of row
 	beq rcounter0 ;
-	cmp r1, #1; //special load operation at start of row
+	cmp r1, #1; special load operation at start of row
 	beq rcounter1 ;
-	b rnormalLoad ;
+	b rnormalLoad ;normal load operation
 rcounter0	
 	mov r2, #0;
 	mov r3, #0;
@@ -46,7 +52,7 @@ rcounter1
 	ldrb r3, [r12];
 	ldrb r4, [r12,#1];
 	b rnext ;
-rnormalLoad	//normal load operation
+rnormalLoad	
 	sub r1, #2; To reach first address, as R1 points to leading address
 	ldrb r2, [r12, r1];
 	add r1, #1;
@@ -62,14 +68,24 @@ rnext
 	add r2, r3;
 	add r2, r4;
 	//move result to memory
+		push {r11, r12}
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, [r12]
 	strb r2, [r11, r1]
+	pop {r11, r12}
 	//loop with counter r1
 	add r1, #1;
 	b colStart
 rowDone
 	add r10, #1; increase row counter
 	add r12, #100; shift r12 to beginning of next row
-	add r11, #100; shift r11 to beginning of next row
+	;shift pointer to output grid with 100
+	push {r11, r12}
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, [r12]
+	add r11, #100;r11 now holds value 100 places further that base address
+	str r11, [r12]
+	pop {r11, r12}
 	b newRow
 rgridDone	
 	bx lr;
