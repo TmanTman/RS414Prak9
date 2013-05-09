@@ -1,0 +1,5 @@
+#commands to output arrays during register replacement operation
+
+save repInit.hex 0x20000000, 0x2000270F
+save repRow.hex 0x20002710, 0x20004e1f
+save repCol.hex 0x20004e20, 0x2000752f 

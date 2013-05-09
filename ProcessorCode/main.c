@@ -1,6 +1,3 @@
-register unsigned int _R0 __asm("r0");  // method 2 : declare 'C' names for the registers
-register unsigned int _R1 __asm("r1");
-
 //init with bogus values to ensure memory area has write permissions
 char grid[10000] = {5};
 char rowOutput[10000] = {3};
@@ -17,7 +14,7 @@ __asm void firRow(void)
 	str r11, [r12]
 	;init counters
 	mov r1, #0; column counter
-	mov r10, #0; row counter
+	mov r0, #0; row counter
 	;Load gain values
  	ldr r12, =__cpp(&tap);
  	ldr r7, [r12];
@@ -29,7 +26,7 @@ newRow
 	//Reset column counter
 	mov r1, #0;
 	//Check whether last row has been reached
-	cmp r10, #100; 
+	cmp r0, #100; 
 	beq rgridDone;
 	//Inner Loop
 colStart 
@@ -77,7 +74,7 @@ rnext
 	add r1, #1;
 	b colStart
 rowDone
-	add r10, #1; increase row counter
+	add r0, #1; increase row counter
 	add r12, #100; shift r12 to beginning of next row
 	;shift pointer to output grid with 100
 	push {r11, r12}
@@ -100,7 +97,7 @@ __asm void firColumn(void)
 	str r11, [r12]
 	;init counters
 	mov r1, #0; column counter
-	mov r10, #0; row counter
+	mov r0, #0; row counter
 	;Load gain values
  	ldr r12, =__cpp(&tap);
  	ldr r7, [r12];
@@ -110,19 +107,19 @@ __asm void firColumn(void)
 	//Outer loop
 newColumn
 	//Reset row counter
-	mov r10, #0;
+	mov r0, #0;
 	//Check whether last column has been reached
 	cmp r1, #100; 
 	beq cgridDone;
 	//Inner Loop
 rowLoop 
 	//Check whether last row has been reached
-	cmp r10, #100;
+	cmp r0, #100;
 	beq colDone;
 	//Load column values
-	cmp r10, #0; //special load operation at start of row
+	cmp r0, #0; //special load operation at start of row
 	beq ccounter0 ;
-	cmp r10, #1; //special load operation at start of row
+	cmp r0, #1; //special load operation at start of row
 	beq ccounter1 ;
 	b cnormalLoad ;
 ccounter0	
@@ -138,7 +135,7 @@ ccounter1
 	ldrb r4, [r12];
 	b cnext ;
 cnormalLoad	//normal load operation
-	sub r12, #200; To reach first address, as R10 points to leading address
+	sub r12, #200; To reach first address, as r12 points to leading address
 	ldrb r2, [r12];
 	add r12, #100;
 	ldrb r3, [r12]
@@ -159,7 +156,7 @@ cnext
 	strb r2, [r11]
 	pop {r11, r12}
 	//increase column counter and base addresses
-	add r10, #1
+	add r0, #1
 	add r12, #100
 	;increase base address of output grid
 	push {r11, r12}

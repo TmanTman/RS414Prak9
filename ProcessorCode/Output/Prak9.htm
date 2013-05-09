@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\Output\Prak9.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Output\Prak9.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 24]: Last Updated: Thu May 09 22:40:55 2013
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5.03 [Build 24]: Last Updated: Thu May 09 23:31:25 2013
 <BR><P>
-<H3>Maximum Stack Usage =         24 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =         16 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 __rt_entry_main &rArr; main &rArr; initGrid
 <P>
@@ -149,7 +149,7 @@ Global Symbols
 <P><STRONG><a name="[3d]"></a>__rt_entry_postsh_1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, rtentry2.o(.ARM.Collect$$rtentry$$00000009))
 
 <P><STRONG><a name="[10]"></a>__rt_entry_main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, rtentry2.o(.ARM.Collect$$rtentry$$0000000D))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24 + Unknown Stack Size
+<BR><BR>[Stack]<UL><LI>Max Depth = 16 + Unknown Stack Size
 <LI>Call Chain = __rt_entry_main &rArr; main &rArr; initGrid
 </UL>
 <BR>[Calls]<UL><LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;exit
@@ -172,11 +172,11 @@ Global Symbols
 <BR><BR>[Calls]<UL><LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_sys_exit
 </UL>
 
-<P><STRONG><a name="[18]"></a>firRow</STRONG> (Thumb, 194 bytes, Stack size 0 bytes, main.o(.emb_text))
+<P><STRONG><a name="[18]"></a>firRow</STRONG> (Thumb, 192 bytes, Stack size 0 bytes, main.o(.emb_text))
 <BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[19]"></a>firColumn</STRONG> (Thumb, 258 bytes, Stack size 0 bytes, main.o(.emb_text))
+<P><STRONG><a name="[19]"></a>firColumn</STRONG> (Thumb, 252 bytes, Stack size 0 bytes, main.o(.emb_text))
 <BR><BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -186,14 +186,14 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__user_setup_stackheap
 </UL>
 
-<P><STRONG><a name="[17]"></a>initGrid</STRONG> (Thumb, 82 bytes, Stack size 16 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = initGrid
+<P><STRONG><a name="[17]"></a>initGrid</STRONG> (Thumb, 82 bytes, Stack size 8 bytes, main.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = initGrid
 </UL>
 <BR>[Called By]<UL><LI><a href="#[11]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
 <P><STRONG><a name="[11]"></a>main</STRONG> (Thumb, 18 bytes, Stack size 8 bytes, main.o(.text))
-<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = main &rArr; initGrid
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = main &rArr; initGrid
 </UL>
 <BR>[Calls]<UL><LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;initGrid
 <LI><a href="#[19]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;firColumn
