@@ -18,7 +18,6 @@ __asm void firRow(void)
  	ldr r6, [r12,#4];
 	ldr r5, [r12,#8];
 	ldr r12, =__cpp(&grid); pointer to grid start address
-	ldr r11, =__cpp(&rowOutput);pointer to outputRow start address
 	//Outer Loop
 newRow
 	//Reset column counter
@@ -63,6 +62,11 @@ rnext
 	add r2, r3;
 	add r2, r4;
 	//move result to memory
+	push {r11, r12}
+	ldr r11, =__cpp(&outputBase)
+	ldr r12, =__cpp(&rowOutput)
+	str r12, [r11, r1]
+	
 	strb r2, [r11, r1]
 	//loop with counter r1
 	add r1, #1;
@@ -173,10 +177,28 @@ void initGrid(void)
 
 __asm void testOB(void)
 {
+	//R12 will hold the pointer to the outputBase integer
+	//During init, R11 holds the pointer to the outputArray which will be loaded into outputBase
+	//Initialize
+	push {r11, r12};Hierdie is nie nodig tydens init want ons sal later r11 en r12 se regte waardes inisialiseer
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, =__cpp(&colOutput)
+	str r11, [r12]
+	pop {r11, r12}
+	//Init done: the int outputBase now contains the start address to the output grid
+	//To write to the output grid (value in r2 to be stored in output array):
+	push {r12}
+	ldr r12, =__cpp(&outputBase)
+	strb r2, [r12]
+	pop {r12}
+	//To increment the base value from where we will be operating:
+	//r12 will hold the address of outputBase integer
+	//r11 will hold the address of the outputgrid, which is the value inside outputBase integer
 	push {r11, r12}
-	ldr r11, =__cpp(&outputBase)
-	ldr r12, =__cpp(&colOutput)
-	str r12, [r11]
+	ldr r12, =__cpp(&outputBase)
+	ldr r11, [r12]
+	add r11, #100;r11 now holds value 100 places further that base address
+	str r11, [r12]
 	pop {r11, r12}
 }
 
