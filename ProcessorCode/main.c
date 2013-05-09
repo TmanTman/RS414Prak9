@@ -62,11 +62,6 @@ rnext
 	add r2, r3;
 	add r2, r4;
 	//move result to memory
-	push {r11, r12}
-	ldr r11, =__cpp(&outputBase)
-	ldr r12, =__cpp(&rowOutput)
-	str r12, [r11, r1]
-	
 	strb r2, [r11, r1]
 	//loop with counter r1
 	add r1, #1;
@@ -187,10 +182,11 @@ __asm void testOB(void)
 	pop {r11, r12}
 	//Init done: the int outputBase now contains the start address to the output grid
 	//To write to the output grid (value in r2 to be stored in output array):
-	push {r12}
+	push {r11, r12}
 	ldr r12, =__cpp(&outputBase)
-	strb r2, [r12]
-	pop {r12}
+	ldr r11, [r12]
+	strb r2, [r11]
+	pop {r11, r12}
 	//To increment the base value from where we will be operating:
 	//r12 will hold the address of outputBase integer
 	//r11 will hold the address of the outputgrid, which is the value inside outputBase integer
