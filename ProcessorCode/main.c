@@ -40,35 +40,35 @@ colStart
 	beq rcounter1 ;
 	b rnormalLoad ;normal load operation
 rcounter0	
-	mov r2, #0;
-	mov r3, #0;
-	ldrb r4, [r12];
+	mov r4, #0;
+	mov r5, #0;
+	ldrb r6, [r12];
 	b rnext ;
 rcounter1
-	mov r2, #0;
-	ldrb r3, [r12];
-	ldrb r4, [r12,#1];
+	mov r4, #0;
+	ldrb r5, [r12];
+	ldrb r6, [r12,#1];
 	b rnext ;
 rnormalLoad	
 	sub r1, #2; To reach first address, as R1 points to leading address
-	ldrb r2, [r12, r1];
-	add r1, #1;
-	ldrb r3, [r12, r1];
-	add r1, #1;
 	ldrb r4, [r12, r1];
+	add r1, #1;
+	ldrb r5, [r12, r1];
+	add r1, #1;
+	ldrb r6, [r12, r1];
 rnext
 	//Do multiplication
-	mul r4, r11;
-	mul r3, r10;
-	mul r2, r9;
+	mul r6, r11;
+	mul r5, r10;
+	mul r4, r9;
 	//add all taps
-	add r2, r3;
-	add r2, r4;
+	add r4, r5;
+	add r4, r6;
 	//move result to memory
 		push {r11, r12}
 	ldr r12, =__cpp(&outputBase)
 	ldr r11, [r12]
-	strb r2, [r11, r1]
+	strb r4, [r11, r1]
 	pop {r11, r12}
 	//loop with counter r1
 	add r1, #1;
@@ -123,37 +123,37 @@ rowLoop
 	beq ccounter1 ;
 	b cnormalLoad ;
 ccounter0	
-	mov r2, #0;
-	mov r3, #0;
-	ldrb r4, [r12];
+	mov r4, #0;
+	mov r5, #0;
+	ldrb r6, [r12];
 	b cnext ;
 ccounter1
-	mov r2, #0;
+	mov r4, #0;
 	sub r12, #100
-	ldrb r3, [r12];
+	ldrb r5, [r12];
 	add r12, #100
-	ldrb r4, [r12];
+	ldrb r6, [r12];
 	b cnext ;
 cnormalLoad	//normal load operation
 	sub r12, #200; To reach first address, as r12 points to leading address
-	ldrb r2, [r12];
+	ldrb r4, [r12];
 	add r12, #100;
-	ldrb r3, [r12]
+	ldrb r5, [r12]
 	add r12, #100;
-	ldrb r4, [r12]
+	ldrb r6, [r12]
 cnext
 	//Do multiplication
-	mul r4, r11;
-	mul r3, r10;
-	mul r2, r9;
+	mul r6, r11;
+	mul r5, r10;
+	mul r4, r9;
 	//add all taps
-	add r2, r3;
-	add r2, r4;
+	add r4, r5;
+	add r4, r6;
 	//move result to memory
 	push {r11, r12}
 	ldr r12, =__cpp(&outputBase)
 	ldr r11, [r12]
-	strb r2, [r11]
+	strb r4, [r11]
 	pop {r11, r12}
 	//increase column counter and base addresses
 	add r0, #1
@@ -213,11 +213,11 @@ __asm void testOB(void)
 	str r11, [r12]
 	pop {r11, r12}
 	//Init done: the int outputBase now contains the start address to the output grid
-	//To write to the output grid (value in r2 to be stored in output array):
+	//To write to the output grid (value in r4 to be stored in output array):
 	push {r11, r12}
 	ldr r12, =__cpp(&outputBase)
 	ldr r11, [r12]
-	strb r2, [r11]
+	strb r4, [r11]
 	pop {r11, r12}
 	//To increment the base value from where we will be operating:
 	//r12 will hold the address of outputBase integer

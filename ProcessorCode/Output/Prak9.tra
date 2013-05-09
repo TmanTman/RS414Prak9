@@ -11,7 +11,7 @@
 ### ADS-LD Output File: '.\Output\Prak9.axf'
 ### ADS-LD Command File: '.\Output\Prak9.lnp'
 ### Checking for dirty Components...
-### Creating CmdFile '.\Output\Prak9.lnp', Handle=0x00000F60
+### Creating CmdFile '.\Output\Prak9.lnp', Handle=0x000010B8
 ### Writing '.lnp' file
 ### ADS-LD Command file '.\Output\Prak9.lnp' is ready.
 ### ADS-LD: About to start ADS-LD Thread.
