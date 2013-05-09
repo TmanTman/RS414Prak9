@@ -5,6 +5,7 @@ char grid[10000] = {5};
 char rowOutput[10000] = {3};
 char colOutput[10000] = {3};
 int tap[3] = {2, 4, 3};
+int outputBase = 0;
 
 __asm void firRow(void)
 {
@@ -17,7 +18,7 @@ __asm void firRow(void)
  	ldr r6, [r12,#4];
 	ldr r5, [r12,#8];
 	ldr r12, =__cpp(&grid); pointer to grid start address
-	ldr r11, =__cpp(&rowOutput);
+	ldr r11, =__cpp(&rowOutput);pointer to outputRow start address
 	//Outer Loop
 newRow
 	//Reset column counter
@@ -156,13 +157,6 @@ cgridDone
 	bx lr;
 }
 
-__asm void testPushPop (void)
-{
-	push {r12}
-	mov r12, #10
-	pop {r12}
-}
-
 void initGrid(void)
 {
 	int i = 0;
@@ -177,10 +171,19 @@ void initGrid(void)
 	}
 }
 
+__asm void testOB(void)
+{
+	push {r11, r12}
+	ldr r11, =__cpp(&outputBase)
+	ldr r12, =__cpp(&colOutput)
+	str r12, [r11]
+	pop {r11, r12}
+}
+
 int main (void) 
 {
 	initGrid();
 	firRow();
 	firColumn();
-	testPushPop();
+	testOB();
 }
